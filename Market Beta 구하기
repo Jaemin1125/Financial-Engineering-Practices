@@ -1,0 +1,49 @@
+#주가데이터를 이용해 주식의 market beta 구하기
+-- Data import후 주가수익률과 지수변화율의 공분산, 지수변화율의 분산 구해 계산해주면 된다
+-- beta==cov(Ri,Rm)/Var(Rm)
+-->결론: Samsung의 market beta는 지수(KOSPI)보다 약간 더(10%) 유동적으로 움직이는 반면(다소 안정적), MU는 지수(S&P500)의 2배 이상으로 시장변화에 매우 민감한 고위험 주식
+import pandas as pd
+import numpy as np
+
+file_path=r"C:/Users/user/Desktop/5-1 강의/AI로 분석하는 투자자심리학/Estimating Beta Samsung Elec KOSPI Daily 2024-2025.xlsx"
+xlsx=pd.ExcelFile(file_path, engine="openpyxl")
+
+
+print(xlsx.sheet_names)
+df=pd.read_excel(file_path, sheet_name=['Samsung Elec','KOSPI'])
+asset=df['Samsung Elec']['Samsung Elec']
+market=df['KOSPI']['KOSPI']
+
+Ri=asset.pct_change().dropna()
+Rm=market.pct_change().dropna()
+
+beta_cov= np.cov(Ri, Rm)[0,1]/np.var(Rm)
+print("Beta_Samsung: ", beta_cov)
+
+
+#Beta_Samsung:  1.0993190775972494
+
+
+file_path2="C:/Users/user/Desktop/5-1 강의/AI로 분석하는 투자자심리학/Estimating Beta Micron US Daily 2024-2025.xlsx"
+xlsx2=pd.ExcelFile(file_path2, engine="openpyxl")
+
+print(xlsx2.sheet_names)
+df=pd.read_excel(file_path2, sheet_name=['MU', 'SP500'])
+
+
+print(df['MU'].columns)
+print(df['SP500'].columns)
+
+asset=df['MU']['MU']
+market=df['SP500']['SPX']
+Ri=asset.pct_change().dropna()
+Rm=market.pct_change().dropna()
+
+beta_cov= np.cov(Ri, Rm)[0,1]/np.var(Rm)
+print("Beta_MU: ", beta_cov)
+
+#Beta_MU:  2.1199300311091642
+
+
+print(df.keys())
+print(df['SP500'].columns)
