@@ -1,0 +1,174 @@
+##최대 분산투자 포트폴리오(Maximum Diversification Portfolio, MDP)
+--각 ETF들의 월말 종가를 기준으로 최대 분산을 가지면서 포트폴리오의 분산(위험)은 최소가 되는 알고리즘 구현
+--volatility of individual assets(weighted)/portfolio volatility(weighted)
+--분산이 최대이면 개별 자산의 리스크는 최대가 되지만, 포트폴리오로 묶으면 변동성이 줄어든다-> 골고루 잘 배분됐다!
+--개별 자산의 리스크 대비 포트폴리오 전체의 리스크는 최소가 되는 가중치를 찾기-> 최대한 골고루 잘 섞은 포트폴리오를 찾기!
+--미래 수익률이 불확실할 때(기대수익률을 추정하기 어려울때) 리스크 중심 접근이 합리적
+--수익률을 예측하지 않고(Not measuring expected return) 리스크를 통해 최적의 포트폴리오를 찾는 방법!!!
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import yfinance as yf
+from scipy.optimize import minimize
+sns.set()
+
+# ETF 데이터 다운로드
+
+tickers = ['XLB', 'XLE', 'XLF', 'XLI', 'XLK', 'XLP', 'XLU', 'XLV', 'XLY']
+data=yf.download(tickers, start='2010-01-01')['Close']
+data=data.resample('ME').last()
+print(data.head())
+
+#data = etf.history(start='2010-01-01', actions=False)     #actions=False: 배당, 분할정보 제외
+#data.drop(['Open', 'High', 'Low', 'Volume'], inplace=True, axis=1)   #inplace=True: column을 원본 data에서 직접 삭제
+#data = data.droplevel(0, axis=1).resample('ME').last()               #axis=0: 행 방향(제거), axis=1: 열 방향(제거)
+
+# 수익률 계산
+rets = data.pct_change().dropna()
+'''
+# 색깔 팔레트
+pal = sns.color_palette('Spectral', len(tickers))     #spectral: seaborn에서 제공하는 컬러 팔레트
+'''
+# 공분산행렬
+cov = np.array(rets.cov() * 12)
+print(cov)
+
+# 각 자산별 변동성
+vol = np.diag(cov)         #각 자산의 분산 구하기
+print(vol)
+
+# 초기값 설정
+noa = rets.shape[1]
+init_guess = np.repeat(1/noa, noa)
+
+# 상하한값
+bounds= ((0.0, 1.0), ) * noa
+
+# 제약조건
+weights_sum_to_1 = {'type': 'eq',
+                    'fun': lambda weights: np.sum(weights) - 1}
+
+# 목적함수 : 마이너스 분산비율
+def neg_div_ratio(weights, vol, cov):
+    weighted_vol = weights.T @ vol
+    port_vol = np.sqrt(weights.T @ cov @ weights)
+    return - weighted_vol / port_vol
+
+# 가중치 계산
+res = minimize(neg_div_ratio,
+               init_guess,
+               args=(vol, cov),
+               method='SLSQP',
+               constraints=(weights_sum_to_1,),
+               bounds=bounds)
+
+#가중치 벡터 표현
+weights = res.x
+print(res.x)
+
+#가중치 표로 정리하기
+weight=np.array([1.49619900e-17, 5.10056012e-01, 3.96817995e-17, 5.52943108e-18,
+ 1.26250775e-01, 1.58293517e-17, 3.20960337e-01, 1.66967135e-17,
+ 4.27328765e-02])
+
+opt_weights=pd.DataFrame({"Ticker":tickers, 'Weight':weight})
+opt_weights["Weight(%)"]=opt_weights['Weight']*100
+opt_weights["Weight(%)"]=opt_weights["Weight(%)"].round(2)
+
+print(opt_weights)
+
+'''
+RESULTS:
+   Ticker   Weight        Weight(%)
+0    XLB  1.496199e-17       0.00
+1    XLE  5.100560e-01      51.01
+2    XLF  3.968180e-17       0.00
+3    XLI  5.529431e-18       0.00
+4    XLK  1.262508e-01      12.63
+5    XLP  1.582935e-17       0.00
+6    XLU  3.209603e-01      32.10
+7    XLV  1.669671e-17       0.00
+8    XLY  4.273288e-02       4.27
+'''
+
+# rets데이터 같은 모양의 dataframe 생성
+mdp_w_df = pd.DataFrame(index=rets.index, columns=tickers)
+
+
+# 공분산행렬의 3차원 배열 생성
+cov = rets.rolling(12).cov().fillna(0) * 12
+cov = cov.values.reshape(int(cov.shape[0] / cov.shape[1]), cov.shape[1], cov.shape[1])
+#cov 행렬의 data
+print(cov)
+print(cov.shape)           #result:(188,9,9)=타임라인 188개, [자산9개, 자산9개]-각 시점마다 9*9의 공분산 행렬이 생긴다 
+print(cov[-1])           #가장 최근 데이터의 공분산
+
+# 각 시점에서의 MDP 가중치 산출
+def neg_div_ratio(weights,vol,cov):
+    weights=np.array(weights).flatten()
+    vol=np.array(vol).flatten()
+    
+    weighted_vol=np.sum(weights*np.sqrt(vol))
+    
+    port_vol=np.sqrt(weights.T@cov@weights)
+    port_vol=port_vol.sum()
+    if port_vol==0:
+        return 1e6
+    return -weighted_vol/port_vol
+
+def get_mdp_weights(cov_matrix):
+    noa= cov_matrix.shape[0]
+    init_guess=np.repeat(1/noa, noa)
+    vol= np.diag(cov_matrix)
+    bounds= ((0.0, 1.0), ) * noa
+    constraints= weights_sum_to_1 = {'type': 'eq',
+                    'fun': lambda weights: np.sum(weights) - 1}
+    res = minimize(neg_div_ratio,
+               init_guess,
+               args=(vol, cov_matrix),
+               method='SLSQP',                        #SLSQP: Sequential Least Squares Quadratic Programming 
+               constraints=(weights_sum_to_1,),         # 제약조건(constraints)와 경계조건(bounds)이 있는 최적화 문제를 풀때 사용
+               bounds=bounds)
+    return res.x
+weights=res.x
+print(res.x)
+
+for i in range(12, len(mdp_w_df)):
+   mdp_w_df.iloc[i] = get_mdp_weights(cov[i-1])     
+
+mdp_w_df=mdp_w_df.astype(float)
+mdp_w_df_pct=mdp_w_df*100
+mdp_w_df_pct=mdp_w_df_pct.round(2)
+
+print(mdp_w_df_pct)
+
+'''
+RESULTS:
+            XLB    XLE  XLF  XLI    XLK    XLP    XLU    XLV    XLY
+Date                                                               
+2010-02-28  NaN    NaN  NaN  NaN    NaN    NaN    NaN    NaN    NaN
+2010-03-31  NaN    NaN  NaN  NaN    NaN    NaN    NaN    NaN    NaN
+2010-04-30  NaN    NaN  NaN  NaN    NaN    NaN    NaN    NaN    NaN
+2010-05-31  NaN    NaN  NaN  NaN    NaN    NaN    NaN    NaN    NaN
+2010-06-30  NaN    NaN  NaN  NaN    NaN    NaN    NaN    NaN    NaN
+...         ...    ...  ...  ...    ...    ...    ...    ...    ...
+2025-05-31  0.0  27.20  0.0  0.0  37.78   2.74  17.32   6.88   8.08
+2025-06-30  0.0  15.92  0.0  0.0  38.19   0.00  16.96  28.93   0.00
+2025-07-31  0.0  13.93  0.0  0.0  25.65  19.39   0.00  29.25  11.78
+2025-08-31  0.0  14.71  0.0  0.0  22.12  20.88   0.00  28.26  14.02
+2025-09-30  0.0   8.62  0.0  0.0  26.85  16.52  10.89  30.93   6.19
+
+[188 rows x 9 columns]
+
+'''
+#MDP portfolio 수익률(returns)
+port_rets = mdp_w_df.shift() * rets                          #shift: 한칸 아래로 밀어서 (직전월의 가중치)x(이번달의 실제 ETF수익률)을 구함
+port_cum_rets = (1 + port_rets.sum(axis=1)).cumprod() - 1     #(1+returns)를 계속 곱해서 누적 수익률을 구함
+
+plt.plot(port_cum_rets.iloc[12:])
+plt.title('MDP Backtest')
+plt.xlabel('Date')
+plt.ylabel('Returns')
+plt.show()
+
