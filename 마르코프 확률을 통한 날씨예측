@@ -12,7 +12,7 @@ num = 10
 index_dict = {}
 future_state = []
 
-for index in range(len(possible_states)): # {'sunny': 0, 'rainy': 1, 'cloudy': 2}
+for index in range(len(possible_states)):       # {'sunny': 0, 'rainy': 1, 'cloudy': 2}
     index_dict[possible_states[index]] = index
 
 for _ in range(num):
