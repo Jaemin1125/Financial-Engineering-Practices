@@ -1,5 +1,5 @@
 #마르코프 확률을 통한 날씨 예측
---마르코프 확률(Marcov chain)
+--마르코프 확률(Marcov chain): 어떤 사건의 결과가 다음 사건에 영향을 주는 확률
 --sunny, rainy, cloudy의 날씨가 나올 확률을 각각 array에 표현해 각각의 날씨일때 그 다음날 날씨를 예측하는 알고리즘
 import numpy as np
 
@@ -17,7 +17,7 @@ for index in range(len(possible_states)):       # {'sunny': 0, 'rainy': 1, 'clou
     index_dict[possible_states[index]] = index
 
 for _ in range(num):
-    new_state = np.random.choice(possible_states, p=transition_matrix[index_dict[start_state], :])    #start_state부터 각각의 날씨에 대응하는 다음날 날씨 확률에 맞춰서 날씨 예측(10일간)
-    future_state.append(new_state)
+    new_state = str(np.random.choice(possible_states, p=transition_matrix[index_dict[start_state], :]))    #start_state부터 각각의 날씨에 대응하는 다음날 날씨 확률에 맞춰서 날씨 예측(10일간)
+    future_state.append(new_state)                                                                      #np.random.choice가 np.str()의 형태로 반환해주기 때문에 앞에 str() 필요
 
 print (future_state) 
