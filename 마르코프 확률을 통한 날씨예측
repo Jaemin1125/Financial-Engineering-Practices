@@ -1,5 +1,5 @@
 #마르코프 확률을 통한 날씨 예측
---마르코프 확률(Marcov chain): 어떤 사건의 결과가 다음 사건에 영향을 주는 확률
+--마르코프 확률(Marcov chain): 어떤 사건의 결과가 다음 사건에 영향을 주는 확률분포
 --sunny, rainy, cloudy의 날씨가 나올 확률을 각각 array에 표현해 각각의 날씨일때 그 다음날 날씨를 예측하는 알고리즘
 import numpy as np
 
