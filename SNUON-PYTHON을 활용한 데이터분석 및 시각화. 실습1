@@ -1,0 +1,283 @@
+x=2
+print(x)
+print(type(x))
+print(x+1)
+print(x*2)
+print(x**3) #제곱 연산
+x+=1
+print(x)#x=x+1과 같은의미
+x*=2
+print(x)
+
+
+y=2.5
+print(type(y))
+print(y, y+1, y*2, y**2)
+
+
+x=9
+print(x/2)  #몫, 소수점까지 계산
+print(x//2)  #몫, 정수로만 계산
+print(x%2)   #나머지
+
+x=9
+print(float(x))
+
+x=3.14
+print(int(x))
+
+
+s="Hello"
+print(s)
+print(type(s))
+print(len(s))
+result=s.upper()
+print(result)
+result1= s.lower()
+print(result1)
+
+print("My name is {}.".format("groot"))
+print("My name is {} and I'm {} years old". format("Groot", 99))
+print("Hello"+" "+"world")
+
+temp="Python"
+print(temp[0])
+print(temp[0:4])
+
+temp="Python is easy"
+result=temp.split()
+print(result)
+      
+temp="Python, is, easy"
+result=temp.split(",")
+print(result)
+
+temp=['Python','is','easy']
+result='#'.join(temp)
+print(result)
+
+
+temp=['Python','is','easy']
+result=' '.join(temp)
+print(result)
+
+x=214
+print(str(x))
+
+
+
+
+t=True
+f=False
+print(type(t))
+print(t and f)
+print(t or f)
+print(not t)
+t=1
+f=0
+print(t and f)
+t==True
+
+
+
+
+def just_print():
+    print("Yes, I'm groot")
+
+just_print()
+
+def add_nums(x,y):
+    print(x+y)
+    
+add_nums(2,3)
+
+
+def add_nums(x,y):
+    return x+y
+
+a= add_nums(3,4)
+print(a)
+
+
+def name_creater(last, first):
+    print(last+first)
+    
+name_creater("그","루트")
+
+
+
+def beverage():
+       print("coke")
+def drink():
+     beverage()
+
+drink()    
+
+
+def circle_area(r):
+    return r**2*3.14
+
+print(circle_area(10))
+
+
+#컨테이너(다른 변수들을 담을 수 있는 자료형-list, dict, tuple, set)
+x=[3,1,2,4,6]
+print(x)
+print(x[0])
+print(x[0:3])
+print(x[1:])
+print(x[-1])
+      
+x.append("밍경")         #list 마지막항에 추가
+print(x)
+x.pop()           #list의 마지막 요소를 삭제하고 반환
+print(x)
+
+del x[0]        #data 순서나 자리 활용해 삭제
+print(x)
+
+x.remove(4)         #data value이용해 삭제
+print(x)
+
+#리스트 합치기
+y=[3,4,5]
+z=x+y
+print(z)
+
+#list 정렬하기
+z.sort()
+print(z)
+
+#list 역순으로 정렬하기
+z.sort(reverse=True)
+print(z)
+
+
+#딕셔너리(dict)
+cage={'cat':'야옹','dog':'멍멍'}
+print(cage)
+print(cage['cat'])
+print(cage.get('cat'))
+print(cage.get('fish','집나감'))
+print('pig' in cage)
+cage['pig']="꿀꿀"
+print(cage)
+del cage['pig']
+print(cage)
+print(cage.keys())
+print(cage.values())
+
+
+#list->dict
+temp=[['cat','야옹'],['dog','멍멍'],['tiger','어흥']]
+cage=dict(temp)
+print(cage)
+
+
+#tuple(값과 크기가 변하지 않음)
+t=(5,6)
+type(t)
+print(t[0])
+def return_tuple(x,y):
+    return x,y
+what=return_tuple(3,4)
+print(what)
+
+#집합(set)-중복을 허용하지 않음
+s={1,2,3,4,5,6,7}
+print(s)
+
+temp=[1,2,3,3,4,4,5]
+print(temp)
+
+what=list(set(temp))
+print(what)
+
+#조건문과 반복문(if, for, while)
+#if
+x='groot'
+if x=='groot':
+    print("I'm groot")
+else:    
+    print("I'm not groot")
+print(x)       
+
+price=7000
+if price>10000:
+    print("거참 창렬일세")
+elif price<3000:
+    print('와우 혜자다 혜자')
+else:
+    print('얼렁 벌어서 소고기 사줘야지')
+    
+price
+
+cage=['cat','dog','tiger']
+if 'cat' in cage:
+    print('밍경아 이리온')
+cage
+
+number=99
+if 99 is not number:
+    print("100점을 못받았어ㅠㅠ")
+else:
+    print("나이스")
+number   
+
+
+#for
+nums=[1,2,3,4,5]
+for number in nums:
+    print(number)
+nums
+
+print(range(5))
+
+cage={'cat':'야옹', 'Dog': '멍멍', 'Tiger': '어흥'}
+for item in cage.items():
+      print(item)
+cage
+
+
+#class=['철수','영희','동수']---class가 예약어(keyword-함수라 생각하면 됨))라 변수명을 쓰면 안됨
+class_1= ['철수','영희','동수']
+for index, student in enumerate(class_1):
+    print('얘 번호는 {}번이구요. 이름은 {}래요'.format(index+1,student))
+class_1
+
+empty_list=[]
+for student in class_1:
+    empty_list.append(student)
+print(empty_list)
+
+
+#while
+temp=1
+while temp <= 10:
+    print(temp)
+    temp+=1
+print(temp)    
+    
+
+def grade(score):
+    if score>= 90:
+        print('A')
+    elif score>=80:
+        print('B')
+    elif score>=70:
+        print('C')
+    elif score>=60:
+        print('D')
+    else:
+        print('F')
+
+grade(75)
+
+
+def best(a,b,c):
+    temp=[a,b,c]
+    temp.sort(reverse=True)
+    print(temp[0])
+
+best(3,5,7)
+
