@@ -1,0 +1,28 @@
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+df = pd.DataFrame(load_iris().data, columns=['X1', 'X2', 'X3', 'X4'])
+display(df)
+
+# 중심통계량
+## 평균
+pd.DataFrame(df.mean()).T
+## 중앙값
+pd.DataFrame(df.median()).T
+## 최빈값
+df.mode()
+# 변동통계량
+## 분산
+pd.DataFrame(df.var()).T
+## 표준편차
+pd.DataFrame(df.std()).T
+# 형태통계량
+## 정규분포의 skewness = 0
+pd.DataFrame(df.skew()).T
+## 정규분포의 kurtosis = 3
+pd.DataFrame(df.kurt()).T
+# 관계통계량
+## 공분산
+df.cov()
+## 상관계수
+df.corr()
