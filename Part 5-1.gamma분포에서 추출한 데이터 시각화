@@ -1,0 +1,34 @@
+#Gamma distribution에서 임의의 data를 추출해 분포를 확률분포 모델(distributions)과 검증하고, 이를 시각화
+
+import numpy as np
+import pandas as pd
+import scipy.stats
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 임의 데이터 생성
+shape, scale = 2, 2    # mean=4, std=2*sqrt(2)
+sample = np.random.gamma(shape, scale, size=100)
+
+# 임의 데이터 시각화
+plt.figure(figsize=(10,4))
+sns.histplot(data=sample, kde=True)    #kde=True: 히스토그램 위에 분포곡선 추가
+plt.show()                             #kde=False: 그냥 히스토그램만(분포곡선 x)
+
+# 분포 모델 후보
+dist_list = ['norm', 't', 'expon', 'chi2', 'gamma', 'beta']
+
+# 모델과 데이터 비교 검증
+result = []
+for dist in dist_list:
+    model = getattr(scipy.stats, dist)    # 분포의 특징 불러오기
+    params = model.fit(sample)    # 데이터를 적합 및 모수 저장
+    ks_stat, p_value = scipy.stats.kstest(sample, dist, params)    # 확률적 검증
+    result.append([dist, p_value])    # 결과 누적 정리
+result = pd.DataFrame(result, columns=['Distribution', 'p-value'])
+result = result.sort_values(by='p-value', ascending=False)
+
+# 최종 결과
+display(result)
+print('제일 비슷한 분포: ', result.iloc[0,0])   
+
