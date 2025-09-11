@@ -1,3 +1,5 @@
+#just 기초 파이썬 문법을 외우기 위해 끄적여본 코드들입니다
+
 x=2
 print(x)
 print(type(x))
