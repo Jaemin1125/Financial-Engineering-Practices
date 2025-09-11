@@ -1,0 +1,116 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from math import factorial
+
+# 이항분포 함수화
+def dist_binomial(n, x, p):
+    combi = factorial(n) / (factorial(x) * factorial(n - x))
+    dist_prob = combi * (p**x) * ((1-p)**(n-x))
+    return dist_prob
+
+# 주사위를 던저서 특정 눈이 나올 확률분포 시각화
+fig, axes = plt.subplots(1,2, figsize=(10,4))
+iteration_list = [10, 60]
+prob = 1/6
+for idx, iteration in enumerate(iteration_list):
+    prob_dist = [dist_binomial(iteration, i, prob) for i in range(1,iteration+1)]
+    sns.barplot(x=list(range(1,iteration+1)), y=prob_dist, ax=axes[idx])
+    axes[idx].set_title('Iteration: '+str(iteration))
+    axes[idx].set_xlim((iteration*prob) - 4*np.sqrt(iteration*prob*(1-prob)),
+                       (iteration*prob) + 4*np.sqrt(iteration*prob*(1-prob)))
+    axes[idx].set_xlabel('count')
+plt.show()
+fig, axes = plt.subplots(1,2, figsize=(10,4))
+iteration_list = [120, 600]
+for idx, iteration in enumerate(iteration_list):
+    prob_dist = [dist_binomial(iteration, i, prob) for i in range(1,iteration+1)]
+    sns.barplot(x=list(range(1,iteration+1)), y=prob_dist, ax=axes[idx])
+    axes[idx].set_title('Iteration: '+str(iteration))
+    axes[idx].set_xlim((iteration*prob) - 4*np.sqrt(iteration*prob*(1-prob)),
+                       (iteration*prob) + 4*np.sqrt(iteration*prob*(1-prob)))
+    axes[idx].set_xlabel('count')
+plt.show()
+
+
+
+import numpy as np
+import pandas as pd
+import random
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 이벤트 확률 추출
+def events_distribution(event, prob, iteration):
+    dist_prob = []
+    for trial in range(iteration):
+        events = random.choices(event, weights=prob, k=100)
+        dist_prob.append(np.mean(events))
+    return dist_prob
+
+# 동전던지기 확률분포 시각화
+event = [0, 1]
+prob = [0.5, 0.5]
+
+fig, axes = plt.subplots(1,2, figsize=(10,4))
+iteration_list = [10, 50]
+for idx, iteration in enumerate(iteration_list):
+    prob_dist = events_distribution(event, prob, iteration)
+    prob_dist = pd.DataFrame(prob_dist, columns=['prob'])
+    sns.histplot(data=prob_dist, x='prob', ax=axes[idx])
+    axes[idx].set_title('Iteration: '+str(iteration))
+    axes[idx].set_xlabel('Mean: {:0.2f}'.format(prob_dist.mean()[0])+' \
+    + Variance: {:0.6f}'.format(prob_dist.var()[0]))
+plt.show()   ##0.2f: 소수점 아래 2자리 0.6f:소수점 아래 6자리
+fig, axes = plt.subplots(1,2, figsize=(10,4))
+iteration_list = [100, 500]
+for idx, iteration in enumerate(iteration_list):
+    prob_dist = events_distribution(event, prob, iteration)
+    prob_dist = pd.DataFrame(prob_dist, columns=['prob'])
+    sns.histplot(data=prob_dist, x='prob', ax=axes[idx])
+    axes[idx].set_title('Iteration: '+str(iteration))
+    axes[idx].set_xlabel('Mean: {:0.2f}'.format(prob_dist.mean()[0])+' \
+    + Variance: {:0.6f}'.format(prob_dist.var()[0]))
+plt.show()
+
+
+
+
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 이벤트 확률 추출
+def events_chidist(iteration):
+    dist_prob = []
+    for trial in range(iteration):
+        events = np.random.chisquare(1, 100)
+        dist_prob.append(np.mean(events))
+    return dist_prob
+
+# 정규분포(평균=0, 분산=1) 사건들의 확률분포 시각화
+fig, axes = plt.subplots(1,2, figsize=(10,4))
+iteration_list = [10, 20]
+for idx, iteration in enumerate(iteration_list):
+    prob_dist = events_chidist(iteration)
+    prob_dist = pd.DataFrame(prob_dist, columns=['prob'])
+    sns.histplot(data=prob_dist, x='prob', ax=axes[idx])
+    axes[idx].set_title('Iteration: '+str(iteration))
+    axes[idx].set_xlabel('Mean: {:0.2f}'.format(prob_dist.mean()[0])+' \
+    + Variance: {:0.6f}'.format(prob_dist.var()[0]))
+plt.show()
+fig, axes = plt.subplots(1,2, figsize=(10,4))
+iteration_list = [50, 100]
+for idx, iteration in enumerate(iteration_list):
+    prob_dist = events_chidist(iteration)
+    prob_dist = pd.DataFrame(prob_dist, columns=['prob'])
+    sns.histplot(data=prob_dist, x='prob', ax=axes[idx])
+    axes[idx].set_title('Iteration: '+str(iteration))
+    axes[idx].set_xlabel('Mean: {:0.2f}'.format(prob_dist.mean()[0])+' \
+    + Variance: {:0.6f}'.format(prob_dist.var()[0]))
+plt.show()
+
